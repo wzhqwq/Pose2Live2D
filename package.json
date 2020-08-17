@@ -1,0 +1,22 @@
+{
+  "name": "pose2live2d",
+  "version": "1.0.0",
+  "description": "facemesh plus live2d",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wzhqwq/Pose2Live2D.git"
+  },
+  "keywords": [
+    "live2d"
+  ],
+  "author": "wzhqwq",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/wzhqwq/Pose2Live2D/issues"
+  },
+  "homepage": "https://github.com/wzhqwq/Pose2Live2D#readme"
+}
