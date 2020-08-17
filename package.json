@@ -2,8 +2,10 @@
   "name": "pose2live2d",
   "version": "1.0.0",
   "description": "facemesh plus live2d",
-  "main": "index.js",
+  "private": true,
   "scripts": {
+    "run": "node build/run.js",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,5 +20,24 @@
   "bugs": {
     "url": "https://github.com/wzhqwq/Pose2Live2D/issues"
   },
-  "homepage": "https://github.com/wzhqwq/Pose2Live2D#readme"
+  "homepage": "https://github.com/wzhqwq/Pose2Live2D#readme",
+  "dependencies": {
+    "@tensorflow-models/facemesh": "file:third_party/facemesh",
+    "@tensorflow-models/posenet": "^2.2.1",
+    "@tensorflow/tfjs-converter": "^1.7.0",
+    "@tensorflow/tfjs-core": "^1.7.0",
+    "jquery": "^3.5.1"
+  },
+  "devDependencies": {
+    "css-loader": "^4.2.1",
+    "http-server": "^0.12.3",
+    "style-loader": "^1.2.1",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.1",
+    "serve": "^11.3.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5"
+  }
 }

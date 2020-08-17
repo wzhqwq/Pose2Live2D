@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="main.js"></script>
+  </head>
+  <body>
+    <div class="float-left">
+      <div class="panel" id="status-panel">
+        <div id="options">
+          <span>auto pause</span><input type="checkbox" id="isAutoPause"><br>
+          <span>show key points</span><input type="checkbox" id="isShowKeyPoints"><br>
+          <span>show pose net</span><input type="checkbox" id="isShowPoseNet"><br>
+        </div>
+      </div>
+      <div class="left-toggle toggle" onclick="$('#status-panel').toggleClass('show')"></div>
+    </div>
+    <div class="center-view" id="center">
+      <span id="status"></span>
+      <video id="from-camera" width="90px" height="120px"></video>
+    </div>
+    <script src="Live2D_Core/live2dcubismcore.min.js"></script>
+  </body>
+</html>

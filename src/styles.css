@@ -1,0 +1,89 @@
+body {
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.float-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  z-index: 100;
+}
+.panel {
+  width: 0px;
+  height: 100%;
+  overflow: hidden;
+  transition: width .3s ease-out;
+  background-color: #fff;
+}
+#status-panel {
+  border-right: 1px solid #aaa;
+  float: left;
+}
+#ctrl-panel {
+  border-left: 1px solid #aaa;
+  float: right;
+}
+
+.toggle {
+  border: 1px solid;
+  width: 40px;
+  height: 80px;
+  cursor: pointer;
+  margin-top: 20px;
+  background-color: #fff;
+}
+.toggle::before {
+  content: "OPTIONS";
+  transform: rotate(90deg);
+  display: block;
+  margin-top: 14px;
+}
+.left-toggle {
+  border-color: #aaa #aaa #aaa #fff;
+  border-radius: 0 10px 10px 0;
+  margin-left: -1px;
+  float: left;
+}
+.right-toggle {
+  border-color: #fff #aaa #aaa #aaa;
+  border-radius: 10px 0 0 10px;
+  margin-right: -1px;
+  float: right;
+}
+.show {
+  width: 160px;
+}
+
+#options {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #eee;
+  width: 130px;
+  margin: 5px;
+  font-size: 14px;
+}
+
+.center-view {
+  width: 400px;
+  margin-left: -200px;
+  position: absolute;
+  left: 50%;
+  top: 20px;
+}
+#status {
+  text-align: center;
+  display: block;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: #eee;
+}
+#from-camera {
+  border-radius: 10px;
+  box-shadow: 0 0 2px #0008;
+  margin-top: 10px;
+  margin-left: 150px;
+  transition: margin-left .3s;
+}
