@@ -50,16 +50,16 @@ export namespace Live2DCubismFramework {
      * @return レンダーテクスチャのアドレス
      */
     public getMaskRenderTexture(): WebGLFramebuffer {
-      let ret: WebGLFramebuffer = 0;
+      let ret: WebGLFramebuffer = null;
 
       // テンポラリのRenderTextureを取得する
-      if (this._maskTexture && this._maskTexture.texture != 0) {
+      if (this._maskTexture && this._maskTexture.texture != null) {
         // 前回使ったものを返す
         this._maskTexture.frameNo = this._currentFrameNo;
         ret = this._maskTexture.texture;
       }
 
-      if (ret == 0) {
+      if (ret == null) {
         // FrameBufferObjectが存在しない場合、新しく生成する
 
         // クリッピングバッファサイズを取得
@@ -1165,7 +1165,7 @@ export namespace Live2DCubismFramework {
     public releaseShaderProgram(): void {
       for (let i = 0; i < this._shaderSets.getSize(); i++) {
         this.gl.deleteProgram(this._shaderSets.at(i).shaderProgram);
-        this._shaderSets.at(i).shaderProgram = 0;
+        this._shaderSets.at(i).shaderProgram = null;
         this._shaderSets.set(i, void 0);
         this._shaderSets.set(i, null);
       }
@@ -1658,7 +1658,7 @@ export namespace Live2DCubismFramework {
 
       if (!vertShader) {
         CubismLogError('Vertex shader compile error!');
-        return 0;
+        return null;
       }
 
       let fragShader = this.compileShaderSource(
@@ -1667,7 +1667,7 @@ export namespace Live2DCubismFramework {
       );
       if (!fragShader) {
         CubismLogError('Vertex shader compile error!');
-        return 0;
+        return null;
       }
 
       // Attach vertex shader to program
@@ -1688,17 +1688,17 @@ export namespace Live2DCubismFramework {
         CubismLogError('Failed to link program: {0}', shaderProgram);
 
         this.gl.deleteShader(vertShader);
-        vertShader = 0;
+        vertShader = null;
 
         this.gl.deleteShader(fragShader);
-        fragShader = 0;
+        fragShader = null;
 
         if (shaderProgram) {
           this.gl.deleteProgram(shaderProgram);
-          shaderProgram = 0;
+          shaderProgram = null;
         }
 
-        return 0;
+        return null;
       }
 
       // Release vertex and fragment shaders.
@@ -1718,10 +1718,10 @@ export namespace Live2DCubismFramework {
     public compileShaderSource(
       shaderType: GLenum,
       shaderSource: string
-    ): WebGLProgram {
+    ): WebGLShader {
       const source: string = shaderSource;
 
-      const shader: WebGLProgram = this.gl.createShader(shaderType);
+      const shader: WebGLShader = this.gl.createShader(shaderType);
       this.gl.shaderSource(shader, source);
       this.gl.compileShader(shader);
 
@@ -1977,7 +1977,7 @@ export namespace Live2DCubismFramework {
       this._clippingContextBufferForDraw = null;
       this._clippingManager = new CubismClippingManager_WebGL();
       this.firstDraw = true;
-      this._textures = new csmMap<number, number>();
+      this._textures = new csmMap<number, WebGLTexture>();
       this._sortedDrawableIndexList = new csmVector<number>();
       this._bufferData = {
         vertex: WebGLBuffer = null,

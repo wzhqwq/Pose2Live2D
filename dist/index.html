@@ -1,23 +1,43 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="main.js"></script>
+    <script src="main.js?ver=1.1.10"></script>
   </head>
   <body>
     <div class="float-left">
       <div class="panel" id="status-panel">
-        <div id="options">
-          <span>auto pause</span><input type="checkbox" id="isAutoPause"><br>
-          <span>show key points</span><input type="checkbox" id="isShowKeyPoints"><br>
-          <span>show pose net</span><input type="checkbox" id="isShowPoseNet"><br>
+        <div style="overflow: auto; width: 260px; height: 100%">
+          <div id="perf"></div>
+          <div id="options" class="block">
+            <span>auto pause</span><input type="checkbox" id="isAutoPause" checked="true"><br>
+            <span>show landmarks</span><input type="checkbox" id="isShowLandmarks"><br>
+            <span>show pose net</span><input type="checkbox" id="isShowPoseNet" checked="true"><br>
+          </div>
+          <li id="controls" class="block" style="font-size: 13px;"></li>
         </div>
       </div>
       <div class="left-toggle toggle" onclick="$('#status-panel').toggleClass('show')"></div>
     </div>
     <div class="center-view" id="center">
-      <span id="status"></span>
-      <video id="from-camera" width="90px" height="120px"></video>
+      <div style="display: flex;">
+        <span id="message"></span>
+        <button id="next-btn">&ogt;</button>
+      </div>
+      <video id="from-camera" width="300px" height="400px"></video>
+      <canvas id="landmarks" width="300px" height="400px"></canvas>
+      <div class="margin">
+        <canvas id="live2d" width="600px" height="600px"></canvas>
+      </div>
     </div>
-    <script src="Live2D_Core/live2dcubismcore.min.js"></script>
+    <div class="float-right">
+      <div class="panel" id="models-panel">
+        <div style="width: 110px; height: 100%;">
+          <li id="models-list"></li>
+        </div>
+      </div>
+      <div class="right-toggle toggle" onclick="$('#models-panel').toggleClass('show')"></div>
+    </div>
+    <div id="aaa"></div>
+    <script src="live2dcubismcore.min.js"></script>
   </body>
 </html>

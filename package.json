@@ -4,7 +4,7 @@
   "description": "facemesh plus live2d",
   "private": true,
   "scripts": {
-    "run": "node build/run.js",
+    "start": "http-server dist",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,18 +26,19 @@
     "@tensorflow-models/posenet": "^2.2.1",
     "@tensorflow/tfjs-converter": "^1.7.0",
     "@tensorflow/tfjs-core": "^1.7.0",
-    "jquery": "^3.5.1"
+    "jquery": "^3.5.1",
+    "stats.js": "^0.17.0"
   },
   "devDependencies": {
     "css-loader": "^4.2.1",
     "http-server": "^0.12.3",
-    "style-loader": "^1.2.1",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.1",
     "serve": "^11.3.0",
-    "ts-loader": "^6.2.1",
-    "typescript": "^3.7.5"
+    "style-loader": "^1.2.1",
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.7.5",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
   }
 }

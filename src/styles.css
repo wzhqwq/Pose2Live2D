@@ -11,6 +11,13 @@ body {
   height: 100%;
   z-index: 100;
 }
+.float-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  z-index: 100;
+}
 .panel {
   width: 0px;
   height: 100%;
@@ -22,10 +29,6 @@ body {
   border-right: 1px solid #aaa;
   float: left;
 }
-#ctrl-panel {
-  border-left: 1px solid #aaa;
-  float: right;
-}
 
 .toggle {
   border: 1px solid;
@@ -36,7 +39,6 @@ body {
   background-color: #fff;
 }
 .toggle::before {
-  content: "OPTIONS";
   transform: rotate(90deg);
   display: block;
   margin-top: 14px;
@@ -47,23 +49,46 @@ body {
   margin-left: -1px;
   float: left;
 }
+.left-toggle::before {
+  content: "OPTIONS";
+}
 .right-toggle {
-  border-color: #fff #aaa #aaa #aaa;
+  border-color: #aaa #fff #aaa #aaa;
   border-radius: 10px 0 0 10px;
   margin-right: -1px;
   float: right;
 }
-.show {
-  width: 160px;
+.right-toggle::before {
+  content: "MODELS";
+}
+#status-panel.show {
+  width: 260px;
+}
+#models-panel.show {
+  width: 110px;
 }
 
-#options {
+#perf {
+  margin: 5px auto;
+  width: 80px;
+  height: 48px;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #eee;
+}
+.block {
   padding: 10px;
   border-radius: 10px;
   background-color: #eee;
-  width: 130px;
   margin: 5px;
   font-size: 14px;
+}
+.block input {
+  float: right;
+}
+.block input[type="range"] {
+  width: 70px;
+  margin: 0;
 }
 
 .center-view {
@@ -73,17 +98,79 @@ body {
   left: 50%;
   top: 20px;
 }
-#status {
+#message {
   text-align: center;
   display: block;
   padding: 5px;
   border-radius: 10px;
   background-color: #eee;
+  flex-grow: 1;
 }
 #from-camera {
   border-radius: 10px;
   box-shadow: 0 0 2px #0008;
-  margin-top: 10px;
-  margin-left: 150px;
+  margin-top: 30px;
+  margin-left: 240px;
+  transform: rotateY(180deg);
+  zoom: .5;
   transition: margin-left .3s;
+}
+#landmarks {
+  margin-left: -310px;
+  zoom: .5;
+  transform: scale(1);
+}
+.margin {
+  width: 600px;
+  height: 600px;
+  margin-left: -100px;
+  margin-top: -200px;
+}
+
+#models-panel {
+  border-left: 1px solid #aaa;
+  float: right;  
+}
+
+li {
+  margin: 5px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  display: block;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul > button {
+  width: 100%;
+  font-size: 16px;
+}
+ul > button:hover {
+  background-color: #f9f9f9;
+}
+.model-selected {
+  background-color: #acf;
+}
+
+button {
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  transition: background-color .3s ease-out;
+  outline: none;
+}
+#next-btn {
+  display: none;
+  background-color: #19f;
+  color: #fff;
+  border-radius: 10px;
+  margin-left: 5px;
+  font-size: 26px;
+  padding: 0 8px;
+}
+#next-btn:hover {
+  background-color: #06b;
 }

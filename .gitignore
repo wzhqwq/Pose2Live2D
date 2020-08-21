@@ -2,7 +2,8 @@
 .vscode
 /dist/*
 !/dist/index.html
-!/dist/model
+!/dist/models
+!/dist/medium
 # Logs
 logs
 *.log

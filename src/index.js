@@ -3,43 +3,47 @@ import "./styles.css";
 import * as facemesh from "@tensorflow-models/facemesh";
 import * as posenet from "@tensorflow-models/posenet";
 import * as $ from "jquery";
+import Stats from "stats.js";
+import {Live2dCtrl} from "./live2d.ts";
 
 window.$ = $;
 
 function msg(m) {
-  $('#status').html(m);
+  $('#message').html(m);
 }
 function err() {
   msg('<span style="color: #c00">Error occurred. Get details from DevTools.</span>');
 }
 
-window.onload = () => {
-  document.title = 'Pose2Live2D';
-  msg('Requesting for camera stream...');
-  start();
-};
-
 var auto_pause = false, paused = false;
-var show_key_points = false, show_pose_net = false;
+var show_landmarks = false, show_pose_net = true;
 function update_options() {
   auto_pause = $('#isAutoPause').prop('checked');
-  show_key_points = $('#isShowKeyPoints').prop('checked');
+  show_landmarks = $('#isShowLandmarks').prop('checked');
   show_pose_net = $('#isShowPoseNet').prop('checked');
 }
 
-var video;
-var faceModel, poseModel;
+const listen_range = (name, getFn) => {
+  $(name).on('mouseup', () => getFn(parseFloat($(name).prop('value'))));
+}
+
+var stat = new Stats();
+window.onload = () => {
+  document.title = 'Pose2Live2D';
+  $('#perf').append(stat.dom);
+  stat.dom.style.position = 'initial';
+  msg('Requesting for camera stream...');
+  update_options();
+  $('#options').on('click', () => update_options());
+  start();
+};
+
+var video, landmark;
+var faceModel, poseModel, live2dModel;
+var models, model_now, param;
 async function start() {
   video = await get_cam();
-
-  update_options();
-  $('#options').on('click', () => { update_options(); });
-  window.onblur = () => {
-    if (auto_pause) pause();
-  };
-  window.onfocus = () => {
-    if (paused) resume();
-  };
+  landmark = document.getElementById('landmarks').getContext('2d');
 
   msg('Downloading Facemesh model...');
   faceModel = await facemesh.load(/*frames default*/5, /*confidence default*/0.9, /*max faces count*/1);
@@ -49,10 +53,11 @@ async function start() {
     outputStride: 16,
     inputResolution: {width: 300, height: 400},
     multiplier: 0.75,
-    quantBytes: 2
+    quantBytes: 2,
+    modelUrl: 'posenet/model-stride16.json'
   });
-
-  msg('Loading Live2D model...');
+  await collect_data();
+  start_live2d();
 }
 
 async function get_cam() {
@@ -75,7 +80,7 @@ async function get_cam() {
     err();
     throw e;
   }
-  msg('loading camera...');
+  msg('Loading camera...');
   return new Promise((res) => {
     video.onloadedmetadata = function () {
       video.play();
@@ -84,13 +89,247 @@ async function get_cam() {
   });
 }
 
-function pause() {
+var minD, maxD;
+const collect_data = () => {
+  msg('Now we need to do a few facial expressions so that program could recognize your facial expression later. Click the button to start.');
+  return new Promise(res => {
+    var progress = 0;
+    $('#next-btn').click(() => {
+      switch (progress) {
+        case 0:
+          progress = 1;
+          msg('Please open your mouth and eyes. Then click the button. You don\'t need to keep this pose during evaluation.');
+          break;
+        case 1:
+          progress = -1;
+          msg('Evaluating...');
+          setTimeout(() => {
+            faceModel.estimateFaces(video).then(p => {
+              if (p.length == 0) {
+                msg('No face detected. Please click the button to try again.');
+                progress = 1;
+                return;
+              }
+              var t = p[0].mesh;
+              maxD = evaluate_face(t);
+              msg('Okey. Please close your mouth and eyes. Then click the button.');
+              progress = 2;
+            });
+          }, 0);
+          break;
+        case 2:
+          progress = -1;
+          msg('Evaluating...');
+          setTimeout(() => {
+            faceModel.estimateFaces(video).then(p => {
+              if (p.length == 0) {
+                msg('No face detected. Please click the button to try again.');
+                progress = 2;
+                return;
+              }
+              var t = p[0].mesh;
+              minD = evaluate_face(t);
+              msg(`${minD.toString()} _ ${maxD.toString()} Then click the button.`);
+              progress = 3;
+            });
+          }, 0);
+          break;
+        case 3:
+          $('#next-btn').css('display', 'none');
+          res();
+          break;
+      }
+    }).css('display', 'block');
+  });
+}
+
+const start_live2d = () => {
+  msg('Loading Live2D model...');
+  var canvas = document.getElementById('live2d');
+  var res;
+  // Double happiness for Mac users
+  if ((res = window.devicePixelRatio) != 1) {
+    canvas.width = 600 * res;
+    canvas.height = 600 * res;
+    canvas.style.zoom = `${(1 / res).toFixed(3)}`;
+  }
+  live2dModel = new Live2dCtrl(canvas);
+
+  $.getJSON('models/models.json', load_models);
+};
+
+async function load_models(res) {
+  models = res.models;
+  for (let i = 0; i < models.length; i++) {
+    $('#models-list').append(`<ul><button id="model-${models[i]}" onclick="load_model('${models[i]}')">${models[i]}</button></ul>`);
+  }
+  await live2dModel.loadModel(model_now = models[0]);
+  await new Promise(load_medium);
+  $('#model-' + model_now).addClass('model-selected');
+  $('#from-camera').css('margin-left', '-30px');
+  msg('Live2D model loaded. Wait for a while...');
+  setTimeout(async function () {
+    await poseModel.estimateSinglePose(video, {
+      flipHorizontal: true
+    });
+    cos_start();
+  }, 300);
+}
+
+window.load_model = async function (name) {
+  if (name == model_now) return;
+  $('#model-' + model_now).removeClass('model-selected');
+  $('#model-' + name).addClass('model-selected');
+  pause();
+  msg('Loading Live2D model... Model paused.');
+  await live2dModel.loadModel(model_now = name);
+  await new Promise(load_medium);
+  msg('￣ω￣=');
+  resume();
+};
+
+const load_medium = res => {
+  $.getJSON(`medium/${model_now}.json`, resp => {
+    setup_medium(resp);
+    res();
+  });
+};
+var changes = {};
+const setup_medium = resp => {
+  param = resp.param;
+  msg('Setting up medium program');
+  var controls = '';
+  param.map(param => {
+    controls += `<ul><span>${param.name}</span><input type="range" id="p-${param.name}" min="${param.min}" max="${param.max}" value="${param.default}" step="0.05"></ul>`;
+  });
+  $('#controls').html(controls);
+  setTimeout(() => {
+    param.map(param => 
+      listen_range('#p-' + param.name, val => {
+        changes[param.name] = val;
+      })
+    );
+  });
+};
+
+const cos_start = () => {
+  msg('￣ω￣=');
+  window.onblur = () => {
+    if (auto_pause) pause();
+  };
+  window.onfocus = () => {
+    if (paused) resume();
+  };
+  stat.showPanel(0);
+  stat.begin();
+  calc();
+};
+// When changing model
+const cos_end = () => {
+  stat.end();
+};
+
+async function calc() {
+  if (paused) return;
+  stat.update();
+
+  const p1 = await faceModel.estimateFaces(video, false, true);
+  const p2 = await poseModel.estimateSinglePose(video, {
+    flipHorizontal: true
+  });
+
+  landmark.clearRect(0, 0, 300, 400);
+  if (p2) {
+    landmark.fillStyle = '#0000ff';
+    let p = p2.keypoints;
+    if (show_pose_net) {
+      p.map(mark => {
+        if (mark.score < 0.9) return;
+        landmark.fillRect(mark.position.x, mark.position.y, 4, 4);
+      });
+    }
+  }
+  var blink_sync = true;
+  if (p1.length > 0 && p1[0].faceInViewConfidence > 0.9) {
+    let p = p1[0];
+    landmark.strokeStyle = '#ff0000';
+    // p.scaledMesh.map(pos => {
+    //   landmark.fillRect(pos[0], pos[1], 2, 2);
+    // })
+    if (show_landmarks) {
+      let t = p.annotations;
+      t.leftEyeLower0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.rightEyeLower0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.leftEyebrowLower.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.rightEyebrowLower.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.leftEyeUpper0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.rightEyeUpper0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.leftEyebrowUpper.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.rightEyebrowUpper.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.lipsUpperInner.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.lipsLowerInner.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.leftCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      t.rightCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+    }
+    if (p.scaledMesh[205][0] - p.scaledMesh[425][0] > 100) {
+      let a = evaluate_face(p.mesh);
+      $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%) ` +
+        `${a[1].toFixed(2)}(${((a[1] - minD[1]) / (maxD[1] - minD[1]) * 100).toFixed(0)}%) ` +
+        `${a[2].toFixed(2)}(${((a[2] - minD[2]) / (maxD[2] - minD[2]) * 100).toFixed(0)}%)`);
+      set_eyes((a[0] - minD[0]) / (maxD[0] - minD[0]), (a[1] - minD[1]) / (maxD[1] - minD[1]));
+      set_mouth((a[2] - minD[2]) / (maxD[2] - minD[2]));
+    }
+    else {
+      blink_sync = false;
+      let a = evaluate_mouth(p.mesh);
+      $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%)`);
+      set_mouth((a[0] - minD[0]) / (maxD[0] - minD[0]));
+    }
+  }
+
+  live2dModel.update(changes, !blink_sync);
+  changes = {};
+
+  requestAnimationFrame(calc);
+}
+
+const evaluate_face = t => {
+  // left eye, right eye, mouth, angle
+  var l1 = t[386], l2 = t[374],
+      r1 = t[159], r2 = t[145],
+      m1 = t[13], m2 = t[14],
+      p1 = t[10], p2 = t[9];
+  var E2L = Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) + (p1[2] - p2[2]) * (p1[2] - p2[2]));
+  return [
+    Math.sqrt((l1[0] - l2[0]) * (l1[0] - l2[0]) + (l1[1] - l2[1]) * (l1[1] - l2[1]) + (l1[2] - l2[2]) * (l1[2] - l2[2])) / E2L,
+    Math.sqrt((r1[0] - r2[0]) * (r1[0] - r2[0]) + (r1[1] - r2[1]) * (r1[1] - r2[1]) + (r1[2] - r2[2]) * (r1[2] - r2[2])) / E2L,
+    Math.sqrt((m1[0] - m2[0]) * (m1[0] - m2[0]) + (m1[1] - m2[1]) * (m1[1] - m2[1]) + (m1[2] - m2[2]) * (m1[2] - m2[2])) / E2L
+  ];
+};
+const evaluate_mouth = t => {
+  // mouth, angle
+  var m1 = t[13], m2 = t[14],
+      p1 = t[10], p2 = t[9];
+  var E2L = Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) + (p1[2] - p2[2]) * (p1[2] - p2[2]));
+  return [Math.sqrt((m1[0] - m2[0]) * (m1[0] - m2[0]) + (m1[1] - m2[1]) * (m1[1] - m2[1]) + (m1[2] - m2[2]) * (m1[2] - m2[2])) / E2L];
+};
+
+const set_eyes = (left, right) => {
+  changes[param[3].name] = left;
+  changes[param[4].name] = right;
+};
+const set_mouth = p => {
+  changes[param[5].name] = p;
+};
+
+const pause = () => {
   paused = true;
   document.title = 'video paused.';
   video.pause();
-}
-function resume() {
+};
+const resume = () => {
   paused = false;
   document.title = 'Pose2Live2D';
   video.play();
-}
+  calc();
+};

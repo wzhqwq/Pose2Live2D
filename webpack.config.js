@@ -6,6 +6,7 @@ module.exports = {
     filename: "main.js",
     path: path.resolve(__dirname, "dist")
   },
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
@@ -22,7 +23,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
-      '@live2d': path.resolve(__dirname, 'live2d/src')
+      '@live2d': path.resolve(__dirname, 'live2d/framework/src')
     }
   }
 }

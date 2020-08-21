@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
+    "module": "ES6",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "experimentalDecorators": true,
@@ -8,13 +9,16 @@
     "outDir": "./dist",
     "removeComments": true,
     "sourceMap": true,
+    "allowJs": true,
     "baseUrl": "./",
     "paths": {
-      "@live2d/*": ["./live2d/src/*"]
+      "@live2d/*": ["./live2d/framework/src/*"]
     }
   },
   "include": [
     "src/live2d.ts",
+    "live2d/core/*.ts",
+    "live2d/framework/src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
