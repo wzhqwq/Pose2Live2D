@@ -233,6 +233,7 @@ async function calc() {
   if (paused) return;
   stat.update();
 
+  var blink_sync = false;
   const p1 = await faceModel.estimateFaces(video, false, true);
   const p2 = await poseModel.estimateSinglePose(video, {
     flipHorizontal: true
@@ -249,7 +250,6 @@ async function calc() {
       });
     }
   }
-  var blink_sync = true;
   if (p1.length > 0 && p1[0].faceInViewConfidence > 0.9) {
     let p = p1[0];
     landmark.strokeStyle = '#ff0000';
@@ -272,47 +272,81 @@ async function calc() {
       t.rightCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
     }
     if (p.scaledMesh[205][0] - p.scaledMesh[425][0] > 100) {
+      blink_sync = true;
       let a = evaluate_face(p.mesh);
-      $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%) ` +
-        `${a[1].toFixed(2)}(${((a[1] - minD[1]) / (maxD[1] - minD[1]) * 100).toFixed(0)}%) ` +
-        `${a[2].toFixed(2)}(${((a[2] - minD[2]) / (maxD[2] - minD[2]) * 100).toFixed(0)}%)`);
+      // $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%) ` +
+      //   `${a[1].toFixed(2)}(${((a[1] - minD[1]) / (maxD[1] - minD[1]) * 100).toFixed(0)}%) ` +
+      //   `${a[2].toFixed(2)}(${((a[2] - minD[2]) / (maxD[2] - minD[2]) * 100).toFixed(0)}%)`);
       set_eyes((a[0] - minD[0]) / (maxD[0] - minD[0]), (a[1] - minD[1]) / (maxD[1] - minD[1]));
       set_mouth((a[2] - minD[2]) / (maxD[2] - minD[2]));
     }
     else {
-      blink_sync = false;
       let a = evaluate_mouth(p.mesh);
       $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%)`);
       set_mouth((a[0] - minD[0]) / (maxD[0] - minD[0]));
     }
   }
 
-  live2dModel.update(changes, !blink_sync);
+  // live2dModel.update(changes, !blink_sync);
   changes = {};
 
   requestAnimationFrame(calc);
 }
 
+const mul = m => m * m;
 const evaluate_face = t => {
-  // left eye, right eye, mouth, angle
+  // left eye, right eye, mouth
   var l1 = t[386], l2 = t[374],
       r1 = t[159], r2 = t[145],
       m1 = t[13], m2 = t[14],
       p1 = t[10], p2 = t[9];
-  var E2L = Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) + (p1[2] - p2[2]) * (p1[2] - p2[2]));
+  var E2L = Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1]) + mul(p1[2] - p2[2]));
   return [
-    Math.sqrt((l1[0] - l2[0]) * (l1[0] - l2[0]) + (l1[1] - l2[1]) * (l1[1] - l2[1]) + (l1[2] - l2[2]) * (l1[2] - l2[2])) / E2L,
-    Math.sqrt((r1[0] - r2[0]) * (r1[0] - r2[0]) + (r1[1] - r2[1]) * (r1[1] - r2[1]) + (r1[2] - r2[2]) * (r1[2] - r2[2])) / E2L,
-    Math.sqrt((m1[0] - m2[0]) * (m1[0] - m2[0]) + (m1[1] - m2[1]) * (m1[1] - m2[1]) + (m1[2] - m2[2]) * (m1[2] - m2[2])) / E2L
+    Math.sqrt(mul(l1[0] - l2[0]) + mul(l1[1] - l2[1]) + mul(l1[2] - l2[2])) / E2L,
+    Math.sqrt(mul(r1[0] - r2[0]) + mul(r1[1] - r2[1]) + mul(r1[2] - r2[2])) / E2L,
+    Math.sqrt(mul(m1[0] - m2[0]) + mul(m1[1] - m2[1]) + mul(m1[2] - m2[2])) / E2L
   ];
 };
 const evaluate_mouth = t => {
-  // mouth, angle
+  // mouth
   var m1 = t[13], m2 = t[14],
       p1 = t[10], p2 = t[9];
-  var E2L = Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) + (p1[2] - p2[2]) * (p1[2] - p2[2]));
-  return [Math.sqrt((m1[0] - m2[0]) * (m1[0] - m2[0]) + (m1[1] - m2[1]) * (m1[1] - m2[1]) + (m1[2] - m2[2]) * (m1[2] - m2[2])) / E2L];
+  var E2L = Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1]) + mul(p1[2] - p2[2]));
+  return [Math.sqrt(mul(m1[0] - m2[0]) + mul(m1[1] - m2[1]) + mul(m1[2] - m2[2])) / E2L];
 };
+const evaluate_angle = t => {
+  // angleX(x), angleY(z), angleZ(-y)
+  // yaw-pitch-roll reverse:
+  // You have: rx, rz: UnitVector
+  // UnitVector extend Vector
+  // const X, Y, Z: BaseVector
+  // BaseVector extend UnitVector
+  // Vector{x, y, z: number; R, project, dot, cross: Function}
+  // Vector.R(axis: BaseVector, angle: number): Vector { return angle * this + (1 - angle) * this.dot(axis) * axis + Math.sqrt(1 - angle * angle) * axis.cross(this)}
+  // Vector.project(axis_a: BaseVector, axis_b: BaseVector): UnitVector // Not so-called 'project'
+  // Vector.dot(t: Vector): number
+  // Vector.cross(t: Vector): Vector
+  // cos(a: UnitVector, b: UnitVector): number { return a.dot(b) }
+  // 1. t1 = rx.R(Y, y_r = cos(rx, rx.project(X, Y))) // x->X_Y
+  // 2. t1 = t1.R(Z, z_r = cos(t1, X)) // x->X
+  // 3. t2 = Y.R(Z, z_r)
+  // 4. t3 = Z.R(t2, y_r)
+  // 5. t3 = t3.R(X, x_r = cos(t2, rz)) // Z->z
+  // Summary:
+  // y_r = cos(rx, rx.project(X, Y))
+  // x_r = cos(Z.R(Y.R(Z, z_r = cos(rx.R(Y, y_r), X)), y_r), rz)
+
+  // Actually I(human precompiler) have: rx, rz: array<number>
+  // const mul = t => t * t;
+  // var rxpl = Math.sqrt(mul(rx[0]) + mul(rx[1]));
+  // var y_r = mul(rx[0]) / rxpl + mul(rx[1]) / rxpl;
+  // var z_r = y_r * rx[0] + Math.sqrt(1 - y_r * y_r) * rx[2];
+  // var t1 = Math.sqrt(1 - y_r * y_r);
+  // var t2 = -Math.sqrt(1 - z_r * z_r) * t1;
+  // var x_r = z_r * t1 * rz[0] + t2 * rz[1] + (t2 + y_r) * rz[2];
+  var p1 = t[10], p2 = t[9], p3 = t[108], p4 = t[337];
+  return [];
+}
 
 const set_eyes = (left, right) => {
   changes[param[3].name] = left;

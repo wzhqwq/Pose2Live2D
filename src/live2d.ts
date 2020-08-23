@@ -114,7 +114,6 @@ class Model extends UserModel {
         }
         Promise.all(p).then(() => {
           this.getRenderer().setIsPremultipliedAlpha(true);
-          this.getRenderer().drawModel();
           res();
         });
       };

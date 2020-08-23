@@ -12,5 +12,14 @@
     ],
     "Physics": "lafei.physics3.json"
   },
-  "Groups": []
+  "Groups": [
+    {
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+  ]
 }
