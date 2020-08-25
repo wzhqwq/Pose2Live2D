@@ -80,7 +80,7 @@ async function get_cam() {
     err();
     throw e;
   }
-  msg('Loading camera...');
+  msg('Setting up camera...');
   return new Promise((res) => {
     video.onloadedmetadata = function () {
       video.play();

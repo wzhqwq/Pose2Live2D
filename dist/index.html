@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="main.js?ver=1.1.27"></script>
+    <script src="main.js?ver=1.2.0"></script>
   </head>
   <body>
     <div class="float-left">
@@ -21,9 +21,9 @@
     <div class="center-view" id="center">
       <div style="display: flex;">
         <span id="message"></span>
-        <button id="next-btn">&ogt;</button>
+        <button id="next-btn" class="msg-btn">&ogt;</button>
       </div>
-      <video id="from-camera" width="300px" height="400px"></video>
+      <video id="from-camera" width="300px" height="400px" playsinline="true" webkit-playsinline="true"></video>
       <canvas id="landmarks" width="300px" height="400px"></canvas>
       <div class="margin">
         <canvas id="live2d" width="600px" height="600px"></canvas>

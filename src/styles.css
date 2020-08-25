@@ -162,7 +162,7 @@ button {
   transition: background-color .3s ease-out;
   outline: none;
 }
-#next-btn {
+.msg-btn {
   display: none;
   background-color: #19f;
   color: #fff;
@@ -171,6 +171,6 @@ button {
   font-size: 26px;
   padding: 0 8px;
 }
-#next-btn:hover {
+.msg-btn:hover {
   background-color: #06b;
 }
