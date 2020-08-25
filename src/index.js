@@ -282,12 +282,15 @@ async function calc() {
     }
     else {
       let a = evaluate_mouth(p.mesh);
-      $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%)`);
+      // $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%)`);
       set_mouth((a[0] - minD[0]) / (maxD[0] - minD[0]));
     }
+    let head = evaluate_angle(p.mesh);
+    $('#aaa').html(`${head[0].toFixed(2)} ${head[1].toFixed(2)}`);
+    set_head(head[0] * 100, head[1] * 100);
   }
 
-  // live2dModel.update(changes, !blink_sync);
+  live2dModel.update(changes, !blink_sync);
   changes = {};
 
   requestAnimationFrame(calc);
@@ -310,12 +313,12 @@ const evaluate_face = t => {
 const evaluate_mouth = t => {
   // mouth
   var m1 = t[13], m2 = t[14],
-      p1 = t[10], p2 = t[9];
+      p1 = t[9], p2 = t[10];
   var E2L = Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1]) + mul(p1[2] - p2[2]));
   return [Math.sqrt(mul(m1[0] - m2[0]) + mul(m1[1] - m2[1]) + mul(m1[2] - m2[2])) / E2L];
 };
 const evaluate_angle = t => {
-  // angleX(x), angleY(z), angleZ(-y)
+  // angleY(z), angleZ(-y)
   // yaw-pitch-roll reverse:
   // You have: rx, rz: UnitVector
   // UnitVector extend Vector
@@ -327,25 +330,36 @@ const evaluate_angle = t => {
   // Vector.dot(t: Vector): number
   // Vector.cross(t: Vector): Vector
   // cos(a: UnitVector, b: UnitVector): number { return a.dot(b) }
-  // 1. t1 = rx.R(Y, y_r = cos(rx, rx.project(X, Y))) // x->X_Y
-  // 2. t1 = t1.R(Z, z_r = cos(t1, X)) // x->X
-  // 3. t2 = Y.R(Z, z_r)
-  // 4. t3 = Z.R(t2, y_r)
-  // 5. t3 = t3.R(X, x_r = cos(t2, rz)) // Z->z
-  // Summary:
-  // y_r = cos(rx, rx.project(X, Y))
-  // x_r = cos(Z.R(Y.R(Z, z_r = cos(rx.R(Y, y_r), X)), y_r), rz)
+  // 1. y_r = cos(rx, rx.project(X, Y)) // x->X_Y
+  // 2. z_r = cos(X, rx.project(X, Y)) // x->X
+  // 3. x_r = cos(Z.R(Y.R(Z, z_r), y_r), rz) // Z->z
 
   // Actually I(human precompiler) have: rx, rz: array<number>
   // const mul = t => t * t;
   // var rxpl = Math.sqrt(mul(rx[0]) + mul(rx[1]));
   // var y_r = mul(rx[0]) / rxpl + mul(rx[1]) / rxpl;
-  // var z_r = y_r * rx[0] + Math.sqrt(1 - y_r * y_r) * rx[2];
+  // var z_r = rx[0] / rxpl;
   // var t1 = Math.sqrt(1 - y_r * y_r);
   // var t2 = -Math.sqrt(1 - z_r * z_r) * t1;
   // var x_r = z_r * t1 * rz[0] + t2 * rz[1] + (t2 + y_r) * rz[2];
-  var p1 = t[10], p2 = t[9], p3 = t[108], p4 = t[337];
-  return [];
+  var p1 = t[108], p2 = t[337], p3 = t[9], p4 = t[10];
+  var rx = [p1[0] - p2[0], p1[2] - p2[2], p1[1] - p2[1]];
+  // var rz = [p3[0] - p4[0], p3[2] - p4[2], p3[1] - p4[1]];
+  var rxl = Math.sqrt(mul(rx[0]) + mul(rx[1]) + mul(rx[2]));
+  // var rzl = Math.sqrt(mul(rz[0]) + mul(rz[1]) + mul(rz[2]));
+  rx = [rx[0] / rxl, rx[1] / rxl, rx[2] / rxl];
+  // rz = [rz[0] / rzl, rz[1] / rzl, rz[2] / rzl];
+  var rxpl = Math.sqrt(mul(rx[0]) + mul(rx[1]));
+  var y_r = mul(rx[0]) / rxpl + mul(rx[1]) / rxpl;
+  var z_r = rx[0] / rxpl;
+  // var t1 = Math.sqrt(1 - y_r * y_r);
+  // var t2 = -Math.sqrt(1 - z_r * z_r) * t1;
+  // var x_r = z_r * t1 * rz[0] + t2 * rz[1] + (t2 + y_r) * rz[2];
+  y_r = Math.acos(y_r); z_r = Math.acos(z_r);
+  if (rx[2] > 0) y_r = -y_r;
+  if (rx[1] < 0) z_r = -z_r;
+  
+  return [y_r, -z_r];
 }
 
 const set_eyes = (left, right) => {
@@ -355,6 +369,10 @@ const set_eyes = (left, right) => {
 const set_mouth = p => {
   changes[param[5].name] = p;
 };
+const set_head = (y, z) => {
+  changes[param[2].name] = -y;
+  changes[param[0].name] = -z;
+}
 
 const pause = () => {
   paused = true;
