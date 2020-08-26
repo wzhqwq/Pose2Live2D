@@ -37,6 +37,66 @@
       "max": 1
     },
     {
+      "name": "ParamBodyAngleX",
+      "default": 0,
+      "min": -10,
+      "max": 10
+    },
+    {
+      "name": "ParamBodyAngleY",
+      "default": 0,
+      "min": -10,
+      "max": 10
+    },
+    {
+      "name": "ParamBodyAngleZ",
+      "default": 0,
+      "min": -10,
+      "max": 10
+    },
+    {
+      "name": "ParamMouthForm",
+      "default": 0,
+      "min": -1,
+      "max": 1
+    },
+    {
+      "name": "PARAM_Arm_LT_Angle",
+      "default": 0,
+      "min": 0,
+      "max": 10
+    },
+    {
+      "name": "PARAM_Arm_RT_Angle",
+      "default": 0,
+      "min": 0,
+      "max": 10
+    },
+    {
+      "name": "PARAM_Arm_LB_Agle",
+      "default": 0,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "PARAM_Arm_RB_Agle",
+      "default": 0,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "PARAM_Arm_L_hand",
+      "default": 0,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "PARAM_Arm_R_hand",
+      "default": 0,
+      "min": 0,
+      "max": 1
+    },
+    {
       "name": "ParamBrowLY",
       "default": 0,
       "min": -1,
@@ -97,12 +157,6 @@
       "max": 1
     },
     {
-      "name": "ParamMouthForm",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
       "name": "PARAM_Mouth",
       "default": 0,
       "min": -1,
@@ -112,222 +166,6 @@
       "name": "PARAM_Mouth_Angle",
       "default": 0,
       "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamCheek",
-      "default": 1,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamBodyAngleX",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamBodyAngleZ",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamBreath",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Bust_Angle_X",
-      "default": 0,
-      "min": -15,
-      "max": 15
-    },
-    {
-      "name": "PARAM_Bust_Angle_Y",
-      "default": 0,
-      "min": -15,
-      "max": 15
-    },
-    {
-      "name": "PARAM_Arm_LT_Angle",
-      "default": 0,
-      "min": 0,
-      "max": 10
-    },
-    {
-      "name": "PARAM_Arm_RT_Angle",
-      "default": 0,
-      "min": 0,
-      "max": 10
-    },
-    {
-      "name": "PARAM_Arm_LB_Agle",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Arm_RB_Agle",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Arm_L_hand",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Arm_R_hand",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hair_Twist_L",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hair_Twist_R",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hairfront_vive",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_L1",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_L2",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_L3",
-      "default": 1,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHl4",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHl5",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHl6",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHl7",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_L8",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_L9",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_R1",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_R2",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_R3",
-      "default": 1,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHr4",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHr5",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHr6",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamHr7",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_R8",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Hand_R9",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_suprise",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_mouth",
-      "default": 1,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_FXmouth",
-      "default": 0,
-      "min": 0,
       "max": 1
     },
     {
@@ -349,43 +187,7 @@
       "max": 10
     },
     {
-      "name": "PARAM_shangxia",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
       "name": "PARAM_eyeFX",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_deng_moveX",
-      "default": 0,
-      "min": -50,
-      "max": 50
-    },
-    {
-      "name": "PARAM_deng_moveY",
-      "default": 0,
-      "min": -50,
-      "max": 50
-    },
-    {
-      "name": "PARAM_deng_moveZ",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "PARAM_deng_qiehuan",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_dengguang",
       "default": 0,
       "min": 0,
       "max": 1
@@ -403,88 +205,16 @@
       "max": 1
     },
     {
-      "name": "PARAM_hand_FX",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_face_FX",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
       "name": "PARAM_beixin_FX",
       "default": 0,
       "min": 0,
       "max": 1
     },
     {
-      "name": "PARAM_dengguang_FX",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_handFX_move",
-      "default": 0,
-      "min": -5,
-      "max": 5
-    },
-    {
-      "name": "PARAM_handFX_moveY",
-      "default": 0,
-      "min": -5,
-      "max": 5
-    },
-    {
-      "name": "PARAM_handFX_moveZ",
-      "default": 0,
-      "min": -5,
-      "max": 5
-    },
-    {
       "name": "PARAM_ALL_moveZ",
       "default": 0,
       "min": -5,
       "max": 5
-    },
-    {
-      "name": "PARAM_kaideng",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_dengxianshi",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_wall_FX",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_wall_X",
-      "default": 0,
-      "min": -5,
-      "max": 5
-    },
-    {
-      "name": "PARAM_wall_Y",
-      "default": 0,
-      "min": -5,
-      "max": 5
-    },
-    {
-      "name": "ParamBodyAngleY",
-      "default": 0,
-      "min": -10,
-      "max": 10
     }
   ]
 }

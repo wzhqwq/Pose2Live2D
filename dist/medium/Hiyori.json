@@ -37,10 +37,52 @@
       "max": 1
     },
     {
-      "name": "ParamCheek",
+      "name": "ParamBodyAngleX",
+      "default": 0,
+      "min": -10,
+      "max": 10
+    },
+    {
+      "name": "ParamBodyAngleY",
+      "default": 0,
+      "min": -10,
+      "max": 10
+    },
+    {
+      "name": "ParamBodyAngleZ",
+      "default": 0,
+      "min": -10,
+      "max": 10
+    },
+    {
+      "name": "ParamMouthForm",
+      "default": 1,
+      "min": -2,
+      "max": 1
+    },
+    {
+      "name": "ParamShoulder",
       "default": 0,
       "min": -1,
       "max": 1
+    },
+    {
+      "name": "ParamLeg",
+      "default": 1,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "ParamArmLA",
+      "default": 0,
+      "min": -10,
+      "max": 10
+    },
+    {
+      "name": "ParamArmRA",
+      "default": 0,
+      "min": -10,
+      "max": 10
     },
     {
       "name": "ParamEyeLSmile",
@@ -115,142 +157,10 @@
       "max": 1
     },
     {
-      "name": "ParamMouthForm",
-      "default": 1,
-      "min": -2,
-      "max": 1
-    },
-    {
-      "name": "ParamBodyAngleX",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamBodyAngleY",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamBodyAngleZ",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamBreath",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamShoulder",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamLeg",
-      "default": 1,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamArmLA",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamArmRA",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamArmLB",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamArmRB",
-      "default": 0,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamHandLB",
-      "default": 10,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamHandRB",
-      "default": 10,
-      "min": -10,
-      "max": 10
-    },
-    {
-      "name": "ParamHandL",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamHandR",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamBustY",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
       "name": "ParamHairAhoge",
       "default": 0,
       "min": -10,
       "max": 10
-    },
-    {
-      "name": "ParamHairFront",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamHairBack",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamSideupRibbon",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamRibbon",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamSkirt",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamSkirt2",
-      "default": 0,
-      "min": -1,
-      "max": 1
     }
-  ]
+ ]
 }

@@ -2,9 +2,11 @@
 This project is inspired from PoseAnimator.
 (才发现早就有同类软件了，但我还要把它完成)
 
-## My changes to third party resource
+## My changes to third party resources
 
-- One of official source codes(rendering/cubismrenderer_webgl.ts) of Live2D is modified due to build errors caused by code bugs.
+- One of official source codes of Live2D(rendering/cubismrenderer_webgl.ts) is modified due to build errors caused by code bugs(TypeErrors).
+
+- One of official source codes of Live2D(effect/cubismbreath.ts) is modified(add -> set) because I can't understand why it add values to breath percentage by frames.
 
 - Live2D models is collected from web, but I removed their motion files and background image to minimize the project size.
 

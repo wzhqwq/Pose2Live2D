@@ -91,14 +91,14 @@ async function get_cam() {
 
 var minD, maxD;
 const collect_data = () => {
-  msg('Now we need to do a few facial expressions so that program could recognize your facial expression later. Click the button to start.');
+  msg('Now we need to imitate some poses so that program could recognize your facial expression and pose later. Click the button to start.');
   return new Promise(res => {
     var progress = 0;
     $('#next-btn').click(() => {
       switch (progress) {
         case 0:
           progress = 1;
-          msg('Please open your mouth and eyes. Then click the button. You don\'t need to keep this pose during evaluation.');
+          msg('Please open your mouth and eyes. Draw your face closer to the camera. Then click the button. You don\'t need to keep this pose during evaluation.');
           break;
         case 1:
           progress = -1;
@@ -112,7 +112,7 @@ const collect_data = () => {
               }
               var t = p[0].mesh;
               maxD = evaluate_face(t);
-              msg('Okey. Please close your mouth and eyes. Then click the button.');
+              msg('Okay. Please close your mouth and eyes. Then click the button.');
               progress = 2;
             });
           }, 0);
@@ -129,15 +129,26 @@ const collect_data = () => {
               }
               var t = p[0].mesh;
               minD = evaluate_face(t);
-              msg(`${minD.toString()} _ ${maxD.toString()} Then click the button.`);
+              minD[3] = evaluate_smile(t);
+              msg(`The last one. Grin and click the button.`);
               progress = 3;
             });
           }, 0);
           break;
         case 3:
-          $('#next-btn').css('display', 'none');
-          res();
-          break;
+          process = -1;
+          setTimeout(() => {
+            faceModel.estimateFaces(video).then(p => {
+              if (p.length == 0) {
+                msg('No face detected. Please click the button to try again.');
+                progress = 3;
+                return;
+              }
+              maxD[3] = evaluate_smile(p[0].mesh);
+              $('#next-btn').css('display', 'none');
+              res();
+            });
+          }, 0);
       }
     }).css('display', 'block');
   });
@@ -229,6 +240,7 @@ const cos_end = () => {
   stat.end();
 };
 
+const mul = m => m * m;
 async function calc() {
   if (paused) return;
   stat.update();
@@ -240,9 +252,15 @@ async function calc() {
   });
 
   landmark.clearRect(0, 0, 300, 400);
+  var offset = 0;
   if (p2) {
     landmark.fillStyle = '#0000ff';
     let p = p2.keypoints;
+    if (p[5].score > 0.9 && p[6].score > 0.9) {
+      offset = Math.acos((p[6].position.x - p[5].position.x) / Math.sqrt(mul(p[6].position.x - p[5].position.x) + mul(p[6].position.y - p[5].position.y)));
+      if (p[5].position.y > p[6].position.y) offset = -offset;
+      set_body(offset * 33);
+    }
     if (show_pose_net) {
       p.map(mark => {
         if (mark.score < 0.9) return;
@@ -252,10 +270,7 @@ async function calc() {
   }
   if (p1.length > 0 && p1[0].faceInViewConfidence > 0.9) {
     let p = p1[0];
-    landmark.strokeStyle = '#ff0000';
-    // p.scaledMesh.map(pos => {
-    //   landmark.fillRect(pos[0], pos[1], 2, 2);
-    // })
+    landmark.fillStyle = '#00ff00';
     if (show_landmarks) {
       let t = p.annotations;
       t.leftEyeLower0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
@@ -271,6 +286,10 @@ async function calc() {
       t.leftCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
       t.rightCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
     }
+    let head = evaluate_face_angle(p.mesh);
+    $('#aaa').html(`${head[0].toFixed(2)} ${head[1].toFixed(2)}`);
+    set_head(head[0] * 100, (head[1] - offset) * 100);
+    set_smile((evaluate_smile(p.mesh) - minD[3]) / (maxD[3] - minD[3]));
     if (p.scaledMesh[205][0] - p.scaledMesh[425][0] > 100) {
       blink_sync = true;
       let a = evaluate_face(p.mesh);
@@ -285,9 +304,6 @@ async function calc() {
       // $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%)`);
       set_mouth((a[0] - minD[0]) / (maxD[0] - minD[0]));
     }
-    let head = evaluate_angle(p.mesh);
-    $('#aaa').html(`${head[0].toFixed(2)} ${head[1].toFixed(2)}`);
-    set_head(head[0] * 100, head[1] * 100);
   }
 
   live2dModel.update(changes, !blink_sync);
@@ -296,9 +312,8 @@ async function calc() {
   requestAnimationFrame(calc);
 }
 
-const mul = m => m * m;
 const evaluate_face = t => {
-  // left eye, right eye, mouth
+  // left eye, right eye, mouth, cheek width
   var l1 = t[386], l2 = t[374],
       r1 = t[159], r2 = t[145],
       m1 = t[13], m2 = t[14],
@@ -311,13 +326,20 @@ const evaluate_face = t => {
   ];
 };
 const evaluate_mouth = t => {
-  // mouth
+  // mouth, cheek width
   var m1 = t[13], m2 = t[14],
       p1 = t[9], p2 = t[10];
   var E2L = Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1]) + mul(p1[2] - p2[2]));
-  return [Math.sqrt(mul(m1[0] - m2[0]) + mul(m1[1] - m2[1]) + mul(m1[2] - m2[2])) / E2L];
+  return [
+    Math.sqrt(mul(m1[0] - m2[0]) + mul(m1[1] - m2[1]) + mul(m1[2] - m2[2])) / E2L,
+  ];
 };
-const evaluate_angle = t => {
+const evaluate_smile = t => {
+  var c1 = t[205], c2 = t[425],
+      p1 = t[108], p2 = t[337];
+  return Math.sqrt(mul(c1[0] - c2[0]) + mul(c1[1] - c2[1]) + mul(c1[2] - c2[2])) / Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1]) + mul(p1[2] - p2[2]));
+}
+const evaluate_face_angle = t => {
   // angleY(z), angleZ(-y)
   // yaw-pitch-roll reverse:
   // You have: rx, rz: UnitVector
@@ -372,6 +394,12 @@ const set_mouth = p => {
 const set_head = (y, z) => {
   changes[param[2].name] = -y;
   changes[param[0].name] = -z;
+}
+const set_body = z => {
+  changes[param[8].name] = z;
+}
+const set_smile = p => {
+  changes[param[9].name] = p;
 }
 
 const pause = () => {

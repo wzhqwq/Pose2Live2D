@@ -70,7 +70,7 @@ export namespace Live2DCubismFramework {
       for (let i = 0; i < this._breathParameters.getSize(); ++i) {
         const data: BreathParameterData = this._breathParameters.at(i);
 
-        model.addParameterValueById(
+        model.setParameterValueById(
           data.parameterId,
           data.offset + data.peak * Math.sin(t / data.cycle),
           data.weight

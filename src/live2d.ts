@@ -3,13 +3,12 @@ import {Live2DCubismFramework as Live2d, Option, LogLevel} from '@live2d/live2dc
 import {Live2DCubismFramework as Live2dSetting} from '@live2d/icubismmodelsetting';
 import {Live2DCubismFramework as Live2dUserModel} from '@live2d/model/cubismusermodel';
 import {Live2DCubismFramework as Live2dSettingJson} from '@live2d/cubismmodelsettingjson';
-import {Live2DCubismFramework as Live2dPhysics} from '@live2d/physics/cubismphysics';
 import {Live2DCubismFramework as Live2dMatrix} from '@live2d/math/cubismmatrix44';
 import {Live2DCubismFramework as Live2dModelMatrix} from '@live2d/math/cubismmodelmatrix';
 import {Live2DCubismFramework as Live2dPose} from '@live2d/effect/cubismpose';
 import {Live2DCubismFramework as Live2dBreath} from '@live2d/effect/cubismbreath';
 import {Live2DCubismFramework as Live2dBlink} from '@live2d/effect/cubismeyeblink';
-
+import {Live2DCubismFramework as Live2dVector} from '@live2d/type/csmvector';
 
 // classes
 import Cubism = Live2d.CubismFramework;
@@ -20,7 +19,9 @@ import Matrix = Live2dMatrix.CubismMatrix44;
 import ModelMatrix = Live2dModelMatrix.CubismModelMatrix;
 import Pose = Live2dPose.CubismPose;
 import Breath = Live2dBreath.CubismBreath;
+import BreathData = Live2dBreath.BreathParameterData;
 import Blink = Live2dBlink.CubismEyeBlink;
+import Vector = Live2dVector.csmVector;
 
 
 function msg(m: string): void {
@@ -51,9 +52,13 @@ class Model extends UserModel {
       .then(resp => resp.arrayBuffer())
       .then(buf => {
         this.loadModel(buf);
+        this._breath = Breath.create();
+        let breaths: Vector<BreathData> = new Vector(1);
+        breaths.pushBack(new BreathData(Cubism.getIdManager().getId('ParamBreath'), 0.5, 0.5, 4, 1));
+        this._breath.setParameters(breaths);
         this._eyeBlink = Blink.create(this._setting);
         this._eyeBlink.setBlinkingInterval(3.0);
-	      this._eyeBlink.setBlinkingSetting(0.2, 0.05, 0.2);
+        this._eyeBlink.setBlinkingSetting(0.2, 0.05, 0.2);
         if (this._setting.getPoseFileName())
           loadPose();
         else
@@ -130,6 +135,7 @@ class Model extends UserModel {
 
   public update(delta: number, auto_blink: boolean) {
     this._physics.evaluate(this._model, delta);
+    this._breath.updateParameters(this._model, delta);
     if (auto_blink) this._eyeBlink.updateParameters(this._model, delta);
     this._model.update();
     this.getRenderer().drawModel();
@@ -156,7 +162,7 @@ export class Live2dCtrl {
     this._size = canvas.width;
   }
 
-  public loadModel(name: string, poseId): Promise<void> {
+  public loadModel(name: string): Promise<void> {
     return new Promise(res => {
       if (this._models.has(name)) {
         this._model = this._models.get(name);
