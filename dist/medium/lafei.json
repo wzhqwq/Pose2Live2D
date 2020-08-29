@@ -61,6 +61,30 @@
       "max": 1
     },
     {
+      "name": "ParamEyeBallX",
+      "default": 0,
+      "min": -1,
+      "max": 1
+    },
+    {
+      "name": "ParamEyeBallY",
+      "default": 0,
+      "min": -1,
+      "max": 1
+    },
+    {
+      "name": "ParamBrowLY",
+      "default": 0,
+      "min": -1,
+      "max": 1
+    },
+    {
+      "name": "ParamBrowRY",
+      "default": 0,
+      "min": -1,
+      "max": 1
+    },
+    {
       "name": "PARAM_Arm_LT_Angle",
       "default": 0,
       "min": 0,
@@ -97,78 +121,6 @@
       "max": 1
     },
     {
-      "name": "ParamBrowLY",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamBrowRY",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamBrowLX",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamBrowRX",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "PARAM_eyebrow_Change",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_eyebrow2_Rotate",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Smile_eye",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Angry_eye",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "ParamEyeBallX",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "ParamEyeBallY",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Mouth",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
-      "name": "PARAM_Mouth_Angle",
-      "default": 0,
-      "min": -1,
-      "max": 1
-    },
-    {
       "name": "PARAM_moveX",
       "default": 0,
       "min": -30,
@@ -193,19 +145,7 @@
       "max": 1
     },
     {
-      "name": "PARAM_arm_LFX",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
       "name": "PARAM_ear_FX",
-      "default": 0,
-      "min": 0,
-      "max": 1
-    },
-    {
-      "name": "PARAM_beixin_FX",
       "default": 0,
       "min": 0,
       "max": 1

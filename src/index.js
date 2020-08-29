@@ -8,12 +8,13 @@ import {Live2dCtrl} from "./live2d.ts";
 
 window.$ = $;
 
-function msg(m) {
+const msg = m => {
   $('#message').html(m);
 }
-function err() {
-  msg('<span style="color: #c00">Error occurred. Get details from DevTools.</span>');
+const err = () => {
+  msg('<span style="color: #c00">Error occurred. Get details from DevTools(F12).</span>');
 }
+const mul = m => m * m;
 
 var auto_pause = false, paused = false;
 var show_landmarks = false, show_pose_net = true;
@@ -89,9 +90,9 @@ async function get_cam() {
   });
 }
 
-var minD, maxD;
+var minD, maxD, tHeight;
 const collect_data = () => {
-  msg('Now we need to imitate some poses so that program could recognize your facial expression and pose later. Click the button to start.');
+  msg('Now we need to imitate some poses so that program could recognize your facial expression and pose later. You need to keep facing the screen. Click the button to start.');
   return new Promise(res => {
     var progress = 0;
     $('#next-btn').click(() => {
@@ -112,6 +113,9 @@ const collect_data = () => {
               }
               var t = p[0].mesh;
               maxD = evaluate_face(t);
+              var p1 = t[9], p2 = t[10];
+              tHeight = Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1]));
+              console.log(Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1])), Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1])));
               msg('Okay. Please close your mouth and eyes. Then click the button.');
               progress = 2;
             });
@@ -200,7 +204,7 @@ window.load_model = async function (name) {
 };
 
 const load_medium = res => {
-  $.getJSON(`medium/${model_now}.json`, resp => {
+  $.getJSON(`medium/${model_now}.json?v=4`, resp => {
     setup_medium(resp);
     res();
   });
@@ -240,16 +244,17 @@ const cos_end = () => {
   stat.end();
 };
 
-const mul = m => m * m;
-async function calc() {
+async function calc() { 
   if (paused) return;
   stat.update();
 
   var blink_sync = false;
   const p1 = await faceModel.estimateFaces(video, false, true);
+  if (paused) return;
   const p2 = await poseModel.estimateSinglePose(video, {
     flipHorizontal: true
   });
+  if (paused) return;
 
   landmark.clearRect(0, 0, 300, 400);
   var offset = 0;
@@ -272,23 +277,24 @@ async function calc() {
     let p = p1[0];
     landmark.fillStyle = '#00ff00';
     if (show_landmarks) {
-      let t = p.annotations;
-      t.leftEyeLower0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.rightEyeLower0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.leftEyebrowLower.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.rightEyebrowLower.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.leftEyeUpper0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.rightEyeUpper0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.leftEyebrowUpper.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.rightEyebrowUpper.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.lipsUpperInner.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.lipsLowerInner.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.leftCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
-      t.rightCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      p.mesh.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2)});
+      // let t = p.annotations;
+      // t.leftEyeLower0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.rightEyeLower0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.leftEyebrowLower.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.rightEyebrowLower.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.leftEyeUpper0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.rightEyeUpper0.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.leftEyebrowUpper.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.rightEyebrowUpper.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.lipsUpperInner.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.lipsLowerInner.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.leftCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
+      // t.rightCheek.map(pos => { landmark.fillRect(pos[0], pos[1], 2, 2); });
     }
     let head = evaluate_face_angle(p.mesh);
-    $('#aaa').html(`${head[0].toFixed(2)} ${head[1].toFixed(2)}`);
-    set_head(head[0] * 100, (head[1] - offset) * 100);
+    // $('#aaa').html(`${head[0].toFixed(2)} ${head[1].toFixed(2)}`);
+    set_head(head[0] * 100, (head[1] - offset) * 100, head[2] * 100);
     set_smile((evaluate_smile(p.mesh) - minD[3]) / (maxD[3] - minD[3]));
     if (p.scaledMesh[205][0] - p.scaledMesh[425][0] > 100) {
       blink_sync = true;
@@ -296,7 +302,7 @@ async function calc() {
       // $('#aaa').html(`${a[0].toFixed(2)}(${((a[0] - minD[0]) / (maxD[0] - minD[0]) * 100).toFixed(0)}%) ` +
       //   `${a[1].toFixed(2)}(${((a[1] - minD[1]) / (maxD[1] - minD[1]) * 100).toFixed(0)}%) ` +
       //   `${a[2].toFixed(2)}(${((a[2] - minD[2]) / (maxD[2] - minD[2]) * 100).toFixed(0)}%)`);
-      set_eyes((a[0] - minD[0]) / (maxD[0] - minD[0]), (a[1] - minD[1]) / (maxD[1] - minD[1]));
+      set_eyes((a[0] - minD[0]) / (maxD[0] - minD[0]), (a[1] - minD[1]) / (maxD[0] - minD[0]));
       set_mouth((a[2] - minD[2]) / (maxD[2] - minD[2]));
     }
     else {
@@ -340,7 +346,7 @@ const evaluate_smile = t => {
   return Math.sqrt(mul(c1[0] - c2[0]) + mul(c1[1] - c2[1]) + mul(c1[2] - c2[2])) / Math.sqrt(mul(p1[0] - p2[0]) + mul(p1[1] - p2[1]) + mul(p1[2] - p2[2]));
 }
 const evaluate_face_angle = t => {
-  // angleY(z), angleZ(-y)
+  // angleX(x) angleY(z), angleZ(y)
   // yaw-pitch-roll reverse:
   // You have: rx, rz: UnitVector
   // UnitVector extend Vector
@@ -364,24 +370,33 @@ const evaluate_face_angle = t => {
   // var t1 = Math.sqrt(1 - y_r * y_r);
   // var t2 = -Math.sqrt(1 - z_r * z_r) * t1;
   // var x_r = z_r * t1 * rz[0] + t2 * rz[1] + (t2 + y_r) * rz[2];
+
   var p1 = t[108], p2 = t[337], p3 = t[9], p4 = t[10];
-  var rx = [p1[0] - p2[0], p1[2] - p2[2], p1[1] - p2[1]];
-  // var rz = [p3[0] - p4[0], p3[2] - p4[2], p3[1] - p4[1]];
+  var rx = [p1[0] - p2[0], p1[2] - p2[2], p1[1] - p2[1]],
+    rz = [p3[0] - p4[0], p3[2] - p4[2], p3[1] - p4[1]];
   var rxl = Math.sqrt(mul(rx[0]) + mul(rx[1]) + mul(rx[2]));
-  // var rzl = Math.sqrt(mul(rz[0]) + mul(rz[1]) + mul(rz[2]));
+  // rzl = Math.sqrt(mul(rz[0]) + mul(rz[1]) + mul(rz[2]));
   rx = [rx[0] / rxl, rx[1] / rxl, rx[2] / rxl];
   // rz = [rz[0] / rzl, rz[1] / rzl, rz[2] / rzl];
   var rxpl = Math.sqrt(mul(rx[0]) + mul(rx[1]));
-  var y_r = mul(rx[0]) / rxpl + mul(rx[1]) / rxpl;
-  var z_r = rx[0] / rxpl;
+  var y_r = Math.acos(mul(rx[0]) / rxpl + mul(rx[1]) / rxpl);
+  var z_r = Math.acos(rx[0] / rxpl);
+  if (rx[2] > 0) y_r = -y_r;
+  if (rx[1] < 0) z_r = -z_r;
   // var t1 = Math.sqrt(1 - y_r * y_r);
   // var t2 = -Math.sqrt(1 - z_r * z_r) * t1;
   // var x_r = z_r * t1 * rz[0] + t2 * rz[1] + (t2 + y_r) * rz[2];
-  y_r = Math.acos(y_r); z_r = Math.acos(z_r);
-  if (rx[2] > 0) y_r = -y_r;
-  if (rx[1] < 0) z_r = -z_r;
-  
-  return [y_r, -z_r];
+
+  // That's a fake way to calculate Y-axis rotation angle(less than 0.5Pi rad), but it seemed to work well.
+  var x_r = Math.sqrt(mul(rz[0]) + mul(rz[2])) / tHeight;
+  if (x_r < 0) x_r = 0;
+  if (x_r > 1)
+    x_r = -Math.acos(2 - x_r);
+  else
+    x_r = Math.acos(x_r);
+  // $('#aaa').html(`${x_r}`);
+
+  return [x_r, -z_r, y_r];
 }
 
 const set_eyes = (left, right) => {
@@ -391,9 +406,12 @@ const set_eyes = (left, right) => {
 const set_mouth = p => {
   changes[param[5].name] = p;
 };
-const set_head = (y, z) => {
-  changes[param[2].name] = -y;
-  changes[param[0].name] = -z;
+const set_head = (x, y, z) => {
+  changes[param[1].name] = x;
+  changes[param[0].name] = -y;
+  changes[param[2].name] = -z;
+  changes[param[10].name] = y / 30;
+  changes[param[11].name] = -x / 30;
 }
 const set_body = z => {
   changes[param[8].name] = z;
