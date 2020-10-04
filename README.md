@@ -29,29 +29,27 @@ To install dependencies and generate main.js:
 
 ```bash
 npm install
-npm start build
+npm run build
 ```
 ### Run
 
 To run project on http server:
 
 ```bash
-npm start run
+npm run start
 ```
 
 ## Now support:
 
 - Blink
 - Mouth open
+- Eye balls
+- Smile (mouth)
 
 ## Will be supported in the future
 
 - Pose
 
 - Brow
-
-- Eye balls
-
-- Smile (mouth, eyes)
 
 - Scared face detect
